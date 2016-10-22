@@ -95,7 +95,7 @@ def uiRemoveAccount(account, *arg):
     
     removeAccount(account, *arg)
     
-def uiReplaceAccount(account,day,ttype,description,value):
+def uiReplaceAccount(accounts,day,ttype,description,value):
     '''
     Function that checks if the given input data can be used in the function and tells the user if there is any error
     
@@ -124,16 +124,16 @@ def uiReplaceAccount(account,day,ttype,description,value):
     
     OK1=False
     OK2=False
-    for i in range(0,len(account)):
-        if account[i]["type"]==ttype:
+    for i in range(0,len(accounts)):
+        if accounts[i]["type"]==ttype:
             OK1=True
-        if account[i]["day"]==day:
+        if accounts[i]["day"]==day:
             OK2=True    
     if OK1==False or OK2==False:
         print("Inexistent data on input day")
         return False
 
-    replaceAccount(account, day, ttype, description, value)
+    replaceAccount(accounts, day, ttype, description, value)
     
 def uiListAccount(accounts,*arg):
     '''
@@ -172,7 +172,7 @@ def uiSumming(accounts,*arg):
     
     input data:
     accounts - the list of all transactions
-    arg - could be in/out OR in/out </=/>
+    arg - could be in/out
     
     output data:
     prints sum of the input type
@@ -278,7 +278,10 @@ def readCommands(cmd,arg):
         if cmd=='exit':
             break
         if cmd=='undo':
-            accounts,accountsBackup,transactionNo = uiUndoOp(accounts,accountsBackup,transactionNo)
+            if transactionNo==0:
+                print("Can't undo, no previous operation!")
+            else:
+                accounts,accountsBackup,transactionNo = uiUndoOp(accounts,accountsBackup,transactionNo)
         elif cmd in commands:
             if checkArgs(cmd, arg)==True:
                 removeUselessArgs(cmd, arg)
@@ -295,9 +298,201 @@ def readCommands(cmd,arg):
     printAccount(accounts)
 
 #######MENUBASED
+def menuAddAccount(accounts):
+    '''
+    Menu-based function that tells the user to input the arguments for executing the function.
+    
+    input data:
+    accounts - the list of all transactions
+    value - an integer
+    type - in/out
+    description - info about the transaction
+    
+    output data:
+    accounts' - the new list of transactions
+    ''' 
+    value=raw_input("Input <value>: ")
+    ttype=raw_input("Input <type>: ")
+    description=raw_input("Input <description>: ")
+    return uiAddAccount(accounts,value,ttype,description)
+
+def menuInsertAccount(accounts):
+    '''
+    Menu-based function that tells the user to input the arguments for executing the function.
+    
+    input data:
+    day - the day of the transaction
+    accounts - the list of all transactions
+    value - an integer
+    type - in/out
+    description - info about the transaction
+    
+    output data:
+    accounts' - the new list of transactions
+    '''
+    day=raw_input("Input <day>: ")
+    value=raw_input("Input <value>: ")
+    ttype=raw_input("Input <type>: ")
+    description=raw_input("Input <description>: ")
+    uiInsertAccount(accounts,day,value,ttype,description)
+
+def menuRemoveAccount(accounts):
+    '''
+    Menu-based function that tells the user to input the arguments for executing the function.
+    
+    input data:
+    day - the day of the transaction
+    accounts - the list of all transactions
+    value - an integer (which will be used for replacement)
+    type - in/out
+    description - info about the transaction
+    
+    output data:
+    accounts' - the new list of transactions
+    '''
+    mode=0
+    while mode!=1 and mode!=2 and mode!=3:
+        mode=raw_input("1: remove day, 2: remove start day to end day, 3: remove type: ")
+        try:
+            mode=int(mode)
+        except ValueError:
+            pass
+        if mode!=1 and mode!=2 and mode!=3:
+            print("Invalid input, try again!")
+    if mode==1:
+        day=raw_input("Input <day>: ")
+        uiRemoveAccount(accounts,day)
+    if mode==2:
+        start_day=raw_input("Input <start day>: ")
+        end_day=raw_input("Input <end day>: ")
+        uiRemoveAccount(accounts,start_day,end_day)
+    if mode==3:
+        ttype=raw_input("Input <type>: ")
+        uiRemoveAccount(accounts,ttype)
+        
+def menuReplaceAccount(accounts):
+    '''
+    Menu-based function that tells the user to input the arguments for executing the function.
+    
+    input data:
+    day - the day of the transaction
+    accounts - the list of all transactions
+    value - an integer (which will be used for replacement)
+    type - in/out
+    description - info about the transaction
+    
+    output data:
+    accounts' - the new list of transactions
+    '''
+    day=raw_input("Input <day>: ")
+    ttype=raw_input("Input <type>: ")
+    description=raw_input("Input <description>: ")
+    value=raw_input("Input <value> to replace with: ")
+    return uiReplaceAccount(accounts, day, ttype, description, value)
+
+def menuListAccount(accounts):
+    '''
+    Menu-based function that tells the user to input the arguments for executing the function.
+    
+    input data:
+    accounts - the list of all transactions
+    arg - could be in/out OR in/out </=/>
+    
+    output data:
+    prints data according to the input
+    '''
+    mode=0
+    while mode!=1 and mode!=2 and mode!=3 and mode!=4:
+        mode=raw_input("1: list all, 2: list type, 3: list values <=> than input number, 4: list balance on certain day: ")
+        try:
+            mode=int(mode)
+        except ValueError:
+            pass
+        if mode!=1 and mode!=2 and mode!=3 and mode!=4:
+            print("Invalid input, try again!")
+    if mode==1:
+        uiListAccount(accounts)
+    if mode==2:
+        ttype=raw_input("Input <type>: ")
+        uiListAccount(accounts,ttype)
+    if mode==3:
+        operator=raw_input("Input <operator> (< or = or >): ")
+        value=raw_input("Input <value>: ")
+        uiListAccount(accounts,operator,value)
+    if mode==4:
+        operator='balance'
+        day=raw_input("Input <day>: ")
+        uiListAccount(accounts,operator,day)
+
+def menuSumming(accounts):
+    '''
+    Menu-based Function that tells the user to input type for executing the command.
+    
+    input data:
+    accounts - the list of all transactions
+    arg - could be in/out
+    
+    output data:
+    prints sum of the input type
+    '''
+    ttype=raw_input("Input <type>: ")
+    uiSumming(accounts,ttype)
+
+def menuMaximum(accounts):
+    '''
+    Menu-based function that tells the user to input arguments for executing the command
+    
+    input data:
+    accounts - the list of all transactions
+    arg - could be in/out and a day
+    
+    output data:
+    prints max of the input type and day
+    '''
+    ttype=raw_input("Input <type>: ")
+    day=raw_input("Input <day>: ")
+    uiMaximum(accounts,ttype,day)
+    
+def menuFiltering(accounts):
+    '''
+    Menu-based function that gets user input for filtering.
+    
+    input data:
+    accounts - the list of all transactions
+    arg - could be in/out and a day
+    
+    output data:
+    keeps in list only the filtered data
+    '''
+    mode=0
+    while mode!=1 and mode!=2 and mode!=3 and mode!=4:
+        mode=raw_input("1: filter type, 2: filter type and value: ")
+        try:
+            mode=int(mode)
+        except ValueError:
+            pass
+        if mode!=1 and mode!=2:
+            print("Invalid input, try again!")
+    if mode==1:
+        ttype=raw_input("Input <type>: ")
+        uiFiltering(accounts,ttype)
+    if mode==2:
+        ttype=raw_input("Input <type>: ")
+        value=raw_input("Input <value>: ")
+        uiListAccount(accounts,ttype,value)
 
 def uiMenu():
-    commands={"add":menuAddAccount,"insert":menuInsertAccount,"remove":menuRemoveAccount,"replace":uiReplaceAccount, "list":uiListAccount, "sum":uiSumming, "max":uiMaximum, "filter":uiFiltering}
+    '''
+    Checks if inputed commands exists and execute a specific function. It stays in the loop and displays available commands until 'exit' is input.
+    
+    input data:
+    cmd - String
+    arg - Tuple
+    
+    output data:
+    according to commands
+    '''  
+    commands={"add":menuAddAccount,"insert":menuInsertAccount,"remove":menuRemoveAccount,"replace":menuReplaceAccount, "list":menuListAccount, "sum":menuSumming, "max":menuMaximum, "filter":menuFiltering}
     accounts=[]
     accountsBackup=[]
     transactionNo=9
@@ -319,36 +514,16 @@ def uiMenu():
         cmd=cmd.lower()
         if cmd=='exit':
             break
-        if commands[cmd](accounts)!=False:
-            sleep(2)
+        if cmd=='undo':
+            if transactionNo==0:
+                print("Can't undo, no previous operation!")
+            else:
+                accounts,accountsBackup,transactionNo = uiUndoOp(accounts,accountsBackup,transactionNo)
+        elif commands[cmd](accounts)!=False:
+            if cmd!='list' and cmd!='sum' and cmd!='max':
+                    accountsBackup = accountsBackup + [accounts[:]]
+                    transactionNo+=1
             print("Command processed!")
-
-def menuAddAccount(accounts):
-    value=raw_input("Input <value>: ")
-    ttype=raw_input("Input <type>: ")
-    description=raw_input("Input <description>: ")
-    uiAddAccount(accounts,value,ttype,description)
-
-def menuInsertAccount(accounts):
-    day=raw_input("Input <day>: ")
-    value=raw_input("Input <value>: ")
-    ttype=raw_input("Input <type>: ")
-    description=raw_input("Input <description>: ")
-    uiInsertAccount(accounts,day,value,ttype,description)
-
-def menuRemoveAccount(accounts):
-    mode=0
-    while mode!=1 or mode!=2 or mode!=3:
-        mode=raw_input("1: remove day, 2: remove start day to end day, 3: remove type")
-        if mode!=1 or mode!=2 or mode!=3:
-            print("Invalid input, try again!")
-    if mode==1:
-        day=raw_input("Input <day>: ")
-        uiRemoveAccount(accounts,day)
-    if mode==2:
-        start_day=raw_input("Input <start day>: ")
-        end_day=raw_input("Input <end day>: ")
-        uiRemoveAccount(accounts,start_day,end_day)
-    if mode==3:
-        ttype=raw_input("Input <type>: ")
-        uiRemoveAccount(accounts,ttype)
+            sleep(1)
+        else:
+            print("Dafuq")
