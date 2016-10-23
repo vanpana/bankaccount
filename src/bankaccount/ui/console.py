@@ -525,5 +525,3 @@ def uiMenu():
                     transactionNo+=1
             print("Command processed!")
             sleep(1)
-        else:
-            print("Dafuq")

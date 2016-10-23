@@ -1,7 +1,7 @@
 import time
 
 from bankaccount.domain.operations import addAccount, insertAccount, removeAccount, \
-    summing, replaceAccount
+    summing, replaceAccount, maximum
 from bankaccount.util.common import backup
 
 
@@ -46,9 +46,23 @@ def testSumming():
     assert(summing([{"day":22, "value":22, "type":'in', "description":'pizza'}, \
                     {"day":13, "value":23, "type":'in', "description":'pizza'}],'in')) == 45
     
+def testMaximum():
+    assert(maximum([{"day":22, "value":22, "type":'in', "description":'pizza'}, \
+                    {"day":22, "value":23, "type":'in', "description":'pasta'}],'in', 22)) == 23
+                    
+def testFiltering():
+    assert(maximum([{"day":22, "value":22, "type":'in', "description":'pizza'}, \
+                    {"day":22, "value":23, "type":'out', "description":'pasta'}],'in', 22)) == \
+                    [{"day":22, "value":22, "type":'in', "description":'pizza'}]
+    assert(maximum([{"day":22, "value":22, "type":'in', "description":'pizza'}, \
+                    {"day":22, "value":23, "type":'in', "description":'pasta'}],'in', 23)) == \
+                    [{"day":22, "value":22, "type":'in', "description":'pizza'}]
+    
     
 def testAll():
     testAddAccount()
     testInsertAccount()
     testRemoveAccount()
     testReplaceAccount()
+    testSumming()
+    testMaximum()

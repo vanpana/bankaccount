@@ -155,7 +155,7 @@ def maximum(accounts,*arg):
     
     input data:
     accounts - the list of all transactions
-    arg - arguments: type, day and value
+    arg - arguments: type, day
     
     output data:
     m - maximum value
@@ -166,21 +166,37 @@ def maximum(accounts,*arg):
             m=int(i['value'])
     return m
 
-'''
-function that filters
-TESTS
-'''
 def filtering(accounts,*arg):
+    '''
+    Function that filters transactions
+    
+    input data:
+    accounts - the list of all transactions
+    arg - arguments: type, type/value
+    
+    output data:
+    accounts' - list of filtered transactions
+    '''
     if (len(arg)==1):
         accounts[:]=[i for i in accounts if i['type']==arg[0]]
     if (len(arg)==2):
         accounts[:]=[i for i in accounts if i['type']==arg[0] and int(i['value'])<int(arg[1])]
     return accounts   
 
-'''
-undo!
-'''
 def undoOp(accounts,accountsBackup,transactionNo):
+    '''
+    Function that undoes the last operation.
+    input data:
+    accounts - the list of all transactions
+    accountsBackup - the list of all backups
+    transactionNo - number of the current transaction
+    
+    output data:
+    accounts' - the new list of all transactions
+    accountsBackup' - the new list of backup list
+    transactionNo' - the new transaction number
+    
+    '''
     accountsBackup.pop()
     transactionNo-=1
     accounts=accountsBackup[transactionNo][:]
