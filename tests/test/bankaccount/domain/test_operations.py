@@ -1,5 +1,7 @@
 import time
-from bankaccount.domain.operations import addAccount, insertAccount, removeAccount
+
+from bankaccount.domain.operations import addAccount, insertAccount, removeAccount, \
+    summing, replaceAccount
 from bankaccount.util.common import backup
 
 
@@ -15,13 +17,7 @@ def testRemoveAccount():
     assert(removeAccount([{"day":22, "value":22, "type":'in', "description":'pizza'}, {"day":23, "value":22, "type":'in', "description":'pizza'}],22,23)==[])
 
 def testReplaceAccount():
-    pass
-
-def testAll():
-    testAddAccount()
-    testInsertAccount()
-    testRemoveAccount()
-    testReplaceAccount()
+    assert(replaceAccount([{"day":22, "value":22, "type":'in', "description":'pizza'}],22,'in','pizza',300)==[{"day":22, "value":300, "type":'in', "description":'pizza'}])
     
 def addSomeValuesForTesting(accounts,accountsBackup):
     addAccount(accounts, '20', 'out', 'pizza')
@@ -45,3 +41,14 @@ def addSomeValuesForTesting(accounts,accountsBackup):
     addAccount(accounts, '800', 'in', 'bank')
     accountsBackup = accountsBackup + [accounts[:]]
     return accounts,accountsBackup
+
+def testSumming():
+    assert(summing([{"day":22, "value":22, "type":'in', "description":'pizza'}, \
+                    {"day":13, "value":23, "type":'in', "description":'pizza'}],'in')) == 45
+    
+    
+def testAll():
+    testAddAccount()
+    testInsertAccount()
+    testRemoveAccount()
+    testReplaceAccount()
